@@ -10,14 +10,18 @@ export default{
     },
     methods: {
         getAllFiatCurrency: function(){
-            var currencyOptions = []
-            axios.get(this.FIAT_CURRENCY_URL).then( result =>{
-                currencyOptions = result.data
-                console.log(currencyOptions);
+            return axios.get(this.FIAT_CURRENCY_URL).then( result =>{
+                return result.data
             }, error => {
-                console.log(error);
+                return error;
             });
-            return currencyOptions;
+        },
+        getFiatCurrencyExchangeRate: function(from, to){
+            return axios.get(this.FIAT_CURRENCY_URL + "?base="+ from + "&" + "symbols=" + from + "," + to).then( result =>{
+                return result.data.rates
+            }, error => {
+                return error;
+            });
         }
     }
 }
