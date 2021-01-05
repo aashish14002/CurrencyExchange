@@ -1,9 +1,0 @@
-{
-    "name": "Currency Exchange",
-    "lang": "en-US",
-    "short_name": "Currency Exchange",
-    "description": "Currency Exchange",
-    "start_url": "/app/",
-    "theme_color": "#00B685",
-    "background_color": "#00B685"
-}
