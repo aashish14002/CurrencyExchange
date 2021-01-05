@@ -5,20 +5,29 @@ export default{
     name: "apiService",
     data(){
         return{
-            FIAT_CURRENCY_URL : "https://api.exchangeratesapi.io/latest/"
+            FIAT_CURRENCY_URL : "https://api.exchangeratesapi.io/latest/",
+            CRYPTO_CURRENCY_URL : "https://api.binance.com/api/v3/"
         }
     },
+    created() {
+        
+    },
     methods: {
-        getAllFiatCurrency: function(){
-            return axios.get(this.FIAT_CURRENCY_URL).then( result =>{
-                return result.data
-            }, error => {
-                return error;
-            });
+        getFiatCurrencyListURL: function() {
+            return this.FIAT_CURRENCY_URL;
         },
-        getFiatCurrencyExchangeRate: function(from, to){
-            return axios.get(this.FIAT_CURRENCY_URL + "?base="+ from + "&" + "symbols=" + from + "," + to).then( result =>{
-                return result.data.rates
+        getFiatCurrencyExchangeRateURL: function(from, to) {
+            return this.FIAT_CURRENCY_URL + "?base="+ from + "&" + "symbols=" + from + "," + to;
+        },
+        getCryptoCurrencyListURL: function() {
+            return this.CRYPTO_CURRENCY_URL + "exchangeInfo";
+        },
+        getCryptoCurrencyExchangeRateURL: function(symbol) {
+            return this.CRYPTO_CURRENCY_URL + "ticker/price?symbol=" + symbol;
+        },
+        getCurrencyData: function(url){
+            return axios.get(url).then( result =>{
+                return result.data
             }, error => {
                 return error;
             });

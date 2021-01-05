@@ -13,7 +13,7 @@
           <div class="currency-section">
             <h2 class="currency-heading">Currency I have</h2>
             <div class="currency-type ">
-              <input class="currency-type-input cursor-pointer"  type="radio" id="fiatFrom" value="fiat" v-model="fromCurrencyType">
+              <input class="currency-type-input cursor-pointer"  type="radio" id="fiatFrom" value="fiat" checked="checked" v-model="fromCurrencyType">
               <label for="fiatFrom" class="cursor-pointer">Fiat Currency</label>
               <input class="currency-type-input cursor-pointer" type="radio" id="cryptoFrom" value="crypto" v-model="fromCurrencyType">
               <label class="cursor-pointer" for="cryptoFrom">Crypto Currency</label>
@@ -21,7 +21,7 @@
             <div class="currency-option">
               <select class="currency-select" id="fromCurrencyNameId" v-model="fromCurrencyName">
                 <option disabled value="">---</option>
-                <option v-for="option in currencyOptions" :key="option" :value="option">
+                <option v-for="option in fromCurrencyOptions" :key="option" :value="option">
                   {{ option }}
                 </option>
               </select>
@@ -29,7 +29,7 @@
             </div>
           </div>
           <div class="currency-convert">
-            <div class="convert-button" v-on:click="getCurrencyExchangeRate">
+            <div class="convert-button" v-on:click="convertCurrency">
               <img width="100%" alt="convert" src="./assets/convert.png"/>
             </div>
           </div>
@@ -37,7 +37,7 @@
           <div class="currency-section">
             <h2 class="currency-heading spacing-left">Currency I Want</h2>
             <div class="currency-type spacing-left">
-              <input class="currency-type-input cursor-pointer" type="radio" id="fiatTo" value="fiat" v-model="toCurrencyType">
+              <input class="currency-type-input cursor-pointer" type="radio" id="fiatTo" value="fiat" checked="checked" v-model="toCurrencyType">
               <label class="cursor-pointer" for="fiatTo">Fiat Currency</label>
               <input class="currency-type-input cursor-pointer" type="radio" id="cryptoTo" value="crypto" v-model="toCurrencyType">
               <label class="cursor-pointer" for="cryptoTo">Crypto Currency</label>
@@ -46,7 +46,7 @@
             <div class="currency-option spacing-left">
               <select class="currency-select" id="toCurrencyNameId" v-model="toCurrencyName">
                 <option disabled value="">---</option>
-                <option v-for="option in currencyOptions" :key="option" :value="option">
+                <option v-for="option in toCurrencyOptions" :key="option" :value="option">
                   {{ option }}
                 </option>
               </select>
@@ -70,36 +70,117 @@ export default {
   },
   data() {
     return {
-      currencyOptions: [],
-      fromCurrencyName: "DKK",
-      toCurrencyName: "INR",
-      fromCurrencyType: "",
-      toCurrencyType: "",
+      cryptoCurrencyOptions: [],
+      fiatCurrencyOptions: [],
+      fromCurrencyName: "",
+      toCurrencyName: "",
+      fromCurrencyType: "fiat",
+      toCurrencyType: "fiat",
       fromCurrencyValue: 0,
-      toCurrencyValue: 0
+      toCurrencyValue: 0,
+      cryptoCurrencyList: []
     }
+  },
+  computed: {
+    fromCurrencyOptions: function() {
+      if(this.fromCurrencyType == "fiat") {
+        return this.fiatCurrencyOptions;
+      } else {
+        return this.cryptoCurrencyOptions;
+      }
+    },
+    toCurrencyOptions: function() {
+      if(this.toCurrencyType == "fiat") {
+        return this.fiatCurrencyOptions;
+      } else {
+        return this.cryptoCurrencyOptions;
+      }
+    }
+  },
+  watch: {
+
   },
   created() {
     
-    
-    this.getAllFiatCurrency().then((data) => {
-      this.currencyOptions = Object.keys(data.rates);
+    var fiatCurrencyListUrl = this.getFiatCurrencyListURL();
+    var cryptoCurrencyListUrl = this.getCryptoCurrencyListURL();
+    this.getCurrencyData(fiatCurrencyListUrl).then((data) => {
+      this.fiatCurrencyOptions = Object.keys(data.rates);
+      this.fiatCurrencyOptions.push(data.base);
     });
+    this.getCurrencyData(cryptoCurrencyListUrl).then((data) => {
+        var currencySymbols = data.symbols;
+        currencySymbols.forEach(symbol => {
+          this.cryptoCurrencyList.push({
+            "symbol"    : symbol.symbol,
+            "baseAsset" : symbol.baseAsset,
+            "quoteAsset": symbol.quoteAsset
+          });
+          if(!this.cryptoCurrencyOptions.includes(symbol.baseAsset)) {
+          this.cryptoCurrencyOptions.push(symbol.baseAsset);
+          }
+          if(!this.cryptoCurrencyOptions.includes(symbol.quoteAsset)) {
+            this.cryptoCurrencyOptions.push(symbol.quoteAsset);
+          }
+        });
+        
+      });
     
   },
   methods: {
-    getCurrencyExchangeRate: function(){
+    convertCurrency: function() {
+      if(this.fromCurrencyName!="" && this.toCurrencyName!="") {
+        if(this.fromCurrencyType == "fiat") {
+          if(this.fromCurrencyType == "fiat") {
+            this.fiatToFiatCurrencyExchange();
+          } else {
+            return;
+          }
+        } else {
+          if(this.fromCurrencyType == "fiat") {
+            return;
+          } else {
+            this.cryptoToCryptoCurrencyExchangeRate();
+          }
+        }
+      }
+    },
+    fiatToFiatCurrencyExchange: function(){
       if(this.fromCurrencyName!="" && this.toCurrencyName!=""){
-        this.getFiatCurrencyExchangeRate(this.fromCurrencyName, this.toCurrencyName).then((data) => {
-          this.toCurrencyValue = this.fromCurrencyValue * data[this.toCurrencyName];
+        var fiatCurrencyUrl = this.getFiatCurrencyExchangeRateURL(this.fromCurrencyName, this.toCurrencyName);
+        this.getCurrencyData(fiatCurrencyUrl).then((data) => {
+          this.toCurrencyValue = this.fromCurrencyValue * data.rates[this.toCurrencyName];
         })
+      }
+    },
+    cryptoToCryptoCurrencyExchangeRate: function(){
+      var symbol = this.fromCurrencyName + this.toCurrencyName;
+      var cond = 0;
+      if(!this.cryptoCurrencyList.some(symb => symb.symbol == symbol)){
+        symbol = this.toCurrencyName + this.fromCurrencyName;
+        if(this.cryptoCurrencyList.some(symb => symb.symbol == symbol)){
+          cond = 1;
+        } else {
+          cond = -1;
+        }
+
+      }
+      if (cond != -1 ) {
+        var cryptoCurrencyUrl = this.getCryptoCurrencyExchangeRateURL(symbol);
+        this.getCurrencyData(cryptoCurrencyUrl).then((data) => {
+          if(cond == 0) {
+            this.toCurrencyValue = this.fromCurrencyValue * data.price;
+          } else {
+            this.toCurrencyValue = this.fromCurrencyValue / data.price;
+          }
+        });
       }
     }
   }
 }
 </script>
 
-<style >
+<style lang="scss">
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
