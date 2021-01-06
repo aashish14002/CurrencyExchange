@@ -17,7 +17,11 @@ export default{
             return this.FIAT_CURRENCY_URL;
         },
         getFiatCurrencyExchangeRateURL: function(from, to) {
-            return this.FIAT_CURRENCY_URL + "?base="+ from + "&" + "symbols=" + from + "," + to;
+            if(from == "EUR"){
+                return this.FIAT_CURRENCY_URL + "?symbols=" + to;
+            } else {
+                return this.FIAT_CURRENCY_URL + "?base="+ from + "&" + "symbols=" + from + "," + to;   
+            }
         },
         getCryptoCurrencyListURL: function() {
             return this.CRYPTO_CURRENCY_URL + "exchangeInfo";

@@ -131,33 +131,81 @@ export default {
     convertCurrency: function() {
       if(this.fromCurrencyName!="" && this.toCurrencyName!="") {
         if(this.fromCurrencyType == "fiat") {
-          if(this.fromCurrencyType == "fiat") {
-            this.fiatToFiatCurrencyExchange();
+          if(this.toCurrencyType == "fiat") {
+            this.fiatToFiatCurrencyExchange(this.fromCurrencyName, this.toCurrencyName, this.fromCurrencyValue);
           } else {
-            return;
+            this.fiatToCryptoCurrencyExchange(this.fromCurrencyName, this.toCurrencyName, this.fromCurrencyValue);
           }
         } else {
-          if(this.fromCurrencyType == "fiat") {
-            return;
+          if(this.toCurrencyType == "fiat") {
+            this.cryptoToFiatCurrencyExchangeRate(this.fromCurrencyName, this.toCurrencyName, this.fromCurrencyValue);
           } else {
-            this.cryptoToCryptoCurrencyExchangeRate();
+            this.cryptoToCryptoCurrencyExchangeRate(this.fromCurrencyName, this.toCurrencyName, this.fromCurrencyValue);
           }
         }
       }
     },
-    fiatToFiatCurrencyExchange: function(){
-      if(this.fromCurrencyName!="" && this.toCurrencyName!=""){
-        var fiatCurrencyUrl = this.getFiatCurrencyExchangeRateURL(this.fromCurrencyName, this.toCurrencyName);
+    fiatToFiatCurrencyExchange: function(fromCurrency, toCurrency, fromCurrencyVal){
+      if(fromCurrency!="" && toCurrency!=""){
+        var fiatCurrencyUrl = this.getFiatCurrencyExchangeRateURL(fromCurrency, toCurrency);
         this.getCurrencyData(fiatCurrencyUrl).then((data) => {
-          this.toCurrencyValue = this.fromCurrencyValue * data.rates[this.toCurrencyName];
+          this.toCurrencyValue = fromCurrencyVal * data.rates[toCurrency];
+        }).catch((error) => {
+          console.log("ERROR: "+error);
         })
       }
     },
-    cryptoToCryptoCurrencyExchangeRate: function(){
-      var symbol = this.fromCurrencyName + this.toCurrencyName;
+    fiatToCryptoCurrencyExchange: function(fromCurrency, toCurrency, fromCurrencyVal){
+      if(fromCurrency!="" && toCurrency!=""){
+        var intermediateCurrency = "EUR";
+        var intermediateFiatCurrencyUrl = this.getFiatCurrencyExchangeRateURL(fromCurrency, intermediateCurrency);
+        this.getCurrencyData(intermediateFiatCurrencyUrl).then((data) => {
+          var intermediateExchangeVal = fromCurrencyVal * data.rates[intermediateCurrency];
+          this.cryptoToCryptoCurrencyExchangeRate(intermediateCurrency, toCurrency, intermediateExchangeVal);
+        }).catch((error) => {
+          console.log("ERROR: "+error);
+        })
+      }
+    },
+    cryptoToCryptoCurrencyExchangeRate: function(fromCurrency, toCurrency, fromCurrencyVal){
+      var [cond, symbol] = this.isCryptoToCryptoCurrencyExchangePossible(fromCurrency, toCurrency);
+      if (cond != -1 ) {
+        var cryptoCurrencyUrl = this.getCryptoCurrencyExchangeRateURL(symbol);
+        this.getCurrencyData(cryptoCurrencyUrl).then((data) => {
+          if(cond == 0) {
+            this.toCurrencyValue = fromCurrencyVal * data.price;
+          } else {
+            this.toCurrencyValue = fromCurrencyVal / data.price;
+          }
+        }).catch((error) => {
+          console.log("ERROR: "+error);
+        });
+      }
+    },
+    cryptoToFiatCurrencyExchangeRate: function(fromCurrency, toCurrency, fromCurrencyVal){
+      var intermediateCurrency = "EUR";
+      var intermediateExchangeVal;
+      var [cond, intermediateSymbol]= this.isCryptoToCryptoCurrencyExchangePossible(fromCurrency, intermediateCurrency);
+      if (cond != -1 ) {
+        var intermediateCryptoCurrencyUrl = this.getCryptoCurrencyExchangeRateURL(intermediateSymbol);
+        this.getCurrencyData(intermediateCryptoCurrencyUrl).then((data) => {
+          if(cond == 0) {
+            intermediateExchangeVal = fromCurrencyVal * data.price;
+            this.fiatToFiatCurrencyExchange(intermediateCurrency, toCurrency, intermediateExchangeVal);
+          } else {
+            intermediateExchangeVal = fromCurrencyVal / data.price;
+            this.fiatToFiatCurrencyExchange(intermediateCurrency, toCurrency, intermediateExchangeVal);
+          }
+        }).catch((error) => {
+          console.log("ERROR: "+error);
+        });
+      }
+    },
+    isCryptoToCryptoCurrencyExchangePossible: function(fromCurrency, toCurrency){
+      var symbol = fromCurrency + toCurrency;
       var cond = 0;
       if(!this.cryptoCurrencyList.some(symb => symb.symbol == symbol)){
-        symbol = this.toCurrencyName + this.fromCurrencyName;
+        symbol = toCurrency + fromCurrency;
         if(this.cryptoCurrencyList.some(symb => symb.symbol == symbol)){
           cond = 1;
         } else {
@@ -165,16 +213,7 @@ export default {
         }
 
       }
-      if (cond != -1 ) {
-        var cryptoCurrencyUrl = this.getCryptoCurrencyExchangeRateURL(symbol);
-        this.getCurrencyData(cryptoCurrencyUrl).then((data) => {
-          if(cond == 0) {
-            this.toCurrencyValue = this.fromCurrencyValue * data.price;
-          } else {
-            this.toCurrencyValue = this.fromCurrencyValue / data.price;
-          }
-        });
-      }
+      return [cond, symbol];
     }
   }
 }
