@@ -259,15 +259,17 @@ export default {
                 padding: 0.5rem;
                 color: #808080;
             }
-            
+
             .spacing-left {
-                padding-left: 40%;
+                padding-left: min(40% , calc(100% - 300px));
             }
         }
 
         .currency-select {
-        height: 20px;
-        margin-right: 1rem;
+            height: 20px;
+            width: 6.7rem;
+            margin-right: 1rem;
+            margin-bottom: 1rem;
         }
 
         .currency-convert {
