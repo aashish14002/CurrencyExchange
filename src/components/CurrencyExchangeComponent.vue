@@ -229,72 +229,69 @@ export default {
 </script>
 
 <style lang="scss">
-.content {
-  display: flex;
-  align-self: center;
-  justify-content: space-around;
-  width: 90%;
-  margin: 2rem;
-  padding: 1rem;
-  box-shadow: 0 0 10px rgba(0,0,0,.1);
-}
+    .content {
+        display: flex;
+        align-self: center;
+        justify-content: space-around;
+        width: 90%;
+        margin: 2rem;
+        padding: 1rem;
+        box-shadow: 0 0 10px rgba(0,0,0,.1);
+    
+        .currency-section {
+            display: flex;
+            flex-direction: column;
+            padding: 2%;
+            flex-basis: 40%;
+            .currency-type {
+                padding: 0.5rem;
 
-.currency-section {
-  display: flex;
-  flex-direction: column;
-  padding: 2%;
-  flex-basis: 40%;
-}
+                .cursor-pointer {
+                    cursor: pointer;
+                }
+            }
 
-.currency-select {
-  height: 20px;
-  margin-right: 1rem;
-}
+            .currency-option {
+                padding: 0.5rem;
+            }
 
-.currency-convert {
-  flex-basis: 6%;
-  align-self:center;
-}
+            .currency-heading {
+                padding: 0.5rem;
+                color: #808080;
+            }
+            
+            .spacing-left {
+                padding-left: 40%;
+            }
+        }
 
-.currency-type {
-  padding: 0.5rem;
-}
+        .currency-select {
+        height: 20px;
+        margin-right: 1rem;
+        }
 
-.currency-option {
-  padding: 0.5rem;
-}
+        .currency-convert {
+            flex-basis: 6%;
+            align-self:center;
+            .convert-button {
+                width: 100%;
+                box-shadow: 0 0 5px -1px rgba(0,0,0,0.2);
+                cursor:pointer;
+                padding: 0.3rem;
+            }
+            .convert-button:active {
+                box-shadow: 0 0 5px -1px rgba(0,0,0,0.6);
+            }
+        }
 
-.currency-heading {
-  padding: 0.5rem;
-  color: #808080;
-}
+    }
 
-.convert-button {
-  width: 100%;
-  box-shadow: 0 0 5px -1px rgba(0,0,0,0.2);
-  cursor:pointer;
-  padding: 0.3rem;
-  
-}
-
-.convert-button:active {
-  box-shadow: 0 0 5px -1px rgba(0,0,0,0.6);
-}
-
-.spacing-left {
-  padding-left: 40%;
-}
-
-.cursor-pointer {
-  cursor: pointer;
-}
-
-.error-bar {
-    color: #D8000C;
-    background-color: #FFBABA;
-    border: 1px solid;
-    background-repeat: no-repeat;
-    background-position: 10px center;
-}
+    .error-bar {
+        color: #D8000C;
+        background-color: #FFBABA;
+        border: 1px solid;
+        background-repeat: no-repeat;
+        background-position: 10px center;
+    }
 
 </style>
