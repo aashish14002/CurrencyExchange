@@ -1,29 +1,30 @@
-# exchange-rate
+# Currency Exchange
 
-## Introduction
+Application to convert fiat and crypto currencies. Just enter select the currencies, enter an amount and get it converted to the selected currency.
 
-We would like you to implement a small exchange-rate website.
+## For fiat currencies
+api: https://exchangeratesapi.io/.
 
-It should be possible to enter a price in one currency and get it converted into the selected currency.
+## For crypto-currencies
+api: https://api.binance.com/api/v3/ticker/price (documentation here: https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#symbol-price-ticker)
 
-The focus should be on writing good and maintainable code. The UI should be usable, but is not the main focus.
-
-
-## Requirements
-
-- It should both support fiat currencies as well as crypto-currencies.
-- It should be possible to exchange between any fiat and any crypto-currency as well.
-- The api calls should be cached whenever possible.
-- It should be easy to add additional apis in the future.
-- It should preferably use Vue.js.
-
-## Details
-
-Additional features and suggestions that didn't make it into the code can be explained and put in a txt file.
-
-For fiat currencies use this api: https://exchangeratesapi.io/.
-
-For crypto-currencies use this api: https://api.binance.com/api/v3/ticker/price (documentation here: https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#symbol-price-ticker)
+# Directory Structure
+── ...
+├── src                   
+│   ├── assets                                  # Stores icons, logos, scss files
+|   |   ├── scss
+|   |   |   └──_variables.scss                  # For global variables for colors, etc.
+|   |   └── ...            
+│   ├── components 
+|   |   ├── BaseCurrencyInput.vue               # Component for currency inputs
+|   |   └── TheCurrencyExchangeComponent.vue    # Base Component for currency exchange form
+│   ├── apiService.js                           # Contains function to get urls and send get request
+│   ├── App.vue                                 # Main Component for app
+│   ├── config.js                               # Stores all constants
+│   ├── main.js                                 # Registes and renders the vue app
+│   └── registerServiceWorker.js                
+├──serviceWorker.js                             # Execute cache strategy 
+└── ...
 
 ## Project setup
 ```
