@@ -1,5 +1,5 @@
 {
-  "name": "exchange-rate",
+  "name": "CurrencyExchange",
   "version": "0.1.0",
   "private": true,
   "scripts": {
