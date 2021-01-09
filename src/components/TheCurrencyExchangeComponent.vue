@@ -4,8 +4,8 @@
             
             <base-currency-input
                 :heading="fromCurrencyLabel"
-                :currency-type-label0="fiatCurrencyTypeLabel"
-                :currency-type-label1="cryptoCurrencyTypeLabel"
+                :currency-type-label0="fromCurrencyTypeLabel"
+                :currency-type-label1="toCurrencyTypeLabel"
                 :currency-options="currencyOptions"
                 :isDisabledCurrencyValue="false"
                 @on-currency-input-change="onFromCurrencyInputChange"
@@ -28,8 +28,8 @@
 
             <base-currency-input
                 :heading="toCurrencyLabel"
-                :currency-type-label0="fiatCurrencyTypeLabel"
-                :currency-type-label1="cryptoCurrencyTypeLabel"
+                :currency-type-label0="fromCurrencyTypeLabel"
+                :currency-type-label1="toCurrencyTypeLabel"
                 :currency-options="currencyOptions"
                 :isDisabledCurrencyValue="true"
                 @on-currency-input-change="onToCurrencyInputChange"
@@ -54,39 +54,45 @@
 
 import apiService from './../apiService.js'
 import BaseCurrencyInput from "./BaseCurrencyInput.vue";
+import { ErrorMsg, LabelMsg } from './../config.js';
 
-const EXCHANGE_NOT_AVAILABLE_ERR = "Exchange Rate not available for this currency";
-const SELECT_CURRENCY_MSG = "Please Select Currencies!";
 
 export default {
-    name: 'CurrencyExchangeComponent',
+    name: 'TheCurrencyExchangeComponent',
     mixins: [apiService],
     components: {
         BaseCurrencyInput
     },
     data() {
         return {
-            fromCurrencyLabel: "Currency I Have",
-            toCurrencyLabel: "Cuurency I Want",
-            fiatCurrencyTypeLabel: "Fiat Currency",
-            cryptoCurrencyTypeLabel: "Crypto Currency",
-            cryptoCurrencyOptions: [],
-            fiatCurrencyOptions: [],
+            fromCurrencyLabel: LabelMsg.FromCurrencyLabel,
+            toCurrencyLabel: LabelMsg.ToCurrencyLabel,
+
+            fromCurrencyTypeLabel: LabelMsg.FromCurrencyTypeLabel,
+            toCurrencyTypeLabel: LabelMsg.ToCurrencyTypeLabel,
+
+            toCurrencyOptions: [],
+            fromCurrencyOptions: [],
+
             fromCurrencyName: "",
             toCurrencyName: "",
-            fromCurrencyType: "fiat",
-            toCurrencyType: "fiat",
+
+            fromCurrencyType: LabelMsg.FromCurrencyType,
+            toCurrencyType: LabelMsg.FromCurrencyType,
+
             fromCurrencyValue: 0,
             toCurrencyValue: 0,
+
             cryptoCurrencyList: [],
+
             errorMessage: ""
         }
     },
     computed: {
         currencyOptions: function() {
             return {
-                0: this.fiatCurrencyOptions,
-                1: this.cryptoCurrencyOptions
+                0: this.fromCurrencyOptions,
+                1: this.toCurrencyOptions
             };
         }
     },
@@ -95,12 +101,15 @@ export default {
         var fiatCurrencyListUrl = this.$_getFiatCurrencyListURL();
         var cryptoCurrencyListUrl = this.$_getCryptoCurrencyListURL();
 
+        //populates from currency options
         this.$_getCurrencyData( fiatCurrencyListUrl )
             .then( (data) => {
-                this.fiatCurrencyOptions = Object.keys( data.rates );
-                this.fiatCurrencyOptions.push( data.base );
+                this.fromCurrencyOptions = Object.keys( data.rates );
+                this.fromCurrencyOptions.push( data.base );
             } );
 
+        //populates to currency options and generate crypto currency list for
+        //verifying whether the exchange is possible between two crypto currencies
         this.$_getCurrencyData( cryptoCurrencyListUrl )
             .then( ( data ) => {
                 var currencySymbols = data.symbols;
@@ -110,11 +119,11 @@ export default {
                         "baseAsset" : symbol.baseAsset,
                         "quoteAsset": symbol.quoteAsset
                     } );
-                    if ( !this.cryptoCurrencyOptions.includes( symbol.baseAsset )) {
-                        this.cryptoCurrencyOptions.push( symbol.baseAsset );
+                    if ( !this.toCurrencyOptions.includes( symbol.baseAsset )) {
+                        this.toCurrencyOptions.push( symbol.baseAsset );
                     }
-                    if ( !this.cryptoCurrencyOptions.includes( symbol.quoteAsset ) ) {
-                        this.cryptoCurrencyOptions.push( symbol.quoteAsset );
+                    if ( !this.toCurrencyOptions.includes( symbol.quoteAsset ) ) {
+                        this.toCurrencyOptions.push( symbol.quoteAsset );
                     }
                 } );   
             } );
@@ -156,9 +165,9 @@ export default {
 
         getCurrencyType: function( currencyType ) {
             if ( currencyType == 0 ) {
-                return "fiat"
+                return LabelMsg.FromCurrencyType;
             } else {
-                return "crypto"
+                return LabelMsg.ToCurrencyType;
             }
         },
 
@@ -172,8 +181,8 @@ export default {
                     return;
                 }
 
-                if ( this.fromCurrencyType == "fiat" ) {
-                    if ( this.toCurrencyType == "fiat" ) {
+                if ( this.fromCurrencyType == LabelMsg.FromCurrencyType ) {
+                    if ( this.toCurrencyType == LabelMsg.FromCurrencyType ) {
                         this.fiatToFiatCurrencyExchange(
                             this.fromCurrencyName,
                             this.toCurrencyName, 
@@ -185,7 +194,7 @@ export default {
                             this.fromCurrencyValue );
                     }
                 } else {
-                    if ( this.toCurrencyType == "fiat" ) {
+                    if ( this.toCurrencyType == LabelMsg.FromCurrencyType ) {
                         this.cryptoToFiatCurrencyExchangeRate(
                             this.fromCurrencyName,
                             this.toCurrencyName,
@@ -198,10 +207,12 @@ export default {
                     }
                 }
             } else {
-                this.errorMessage = SELECT_CURRENCY_MSG;
+                this.errorMessage = ErrorMsg.SELECT_CURRENCY_MSG;
             }
         },
 
+        //sends request to get exchange rate for fiat currencies and updates
+        //the converted currency value or display a message in case of error
         fiatToFiatCurrencyExchange: function( fromCurrency, 
                                         toCurrency, fromCurrencyVal ) {
             var fiatCurrencyUrl = this.$_getFiatCurrencyExchangeRateURL(
@@ -213,10 +224,14 @@ export default {
                                             data.rates[toCurrency];
                 } )
                 .catch( () => {
-                    this.errorMessage = EXCHANGE_NOT_AVAILABLE_ERR;
+                    this.errorMessage = ErrorMsg.EXCHANGE_NOT_AVAILABLE_ERR;
                 } );
         },
 
+        //For converting fiat currency to crypto currency, it first convert the
+        //given fiat currency to EUR and then convert the EURO to the given
+        //crypto currency. Then it either updates the converted currency value
+        //or display a message in case of error
         fiatToCryptoCurrencyExchange: function( fromCurrency, toCurrency,
                                         fromCurrencyVal ) {
             var intermediateCurrency = "EUR";
@@ -234,10 +249,15 @@ export default {
                         intermediateExchangeVal );
                 } )
                 .catch( () => {
-                    this.errorMessage = EXCHANGE_NOT_AVAILABLE_ERR;
+                    this.errorMessage = ErrorMsg.EXCHANGE_NOT_AVAILABLE_ERR;
                 } )
         },
 
+        //First checks whether the exchange rate is available for fromCurrency
+        //to toCurrency or vice-versa. If not, then display a error message.
+        //otherwise, sends request to get exchange rate for crypto currencies
+        //and updates the converted currency value or display a message in case
+        //of error
         cryptoToCryptoCurrencyExchangeRate: function( fromCurrency, toCurrency,
                                                 fromCurrencyVal ) {
             var [ cond, symbol ] = this.isCryptoToCryptoCurrencyExchangePossible(
@@ -255,13 +275,17 @@ export default {
                         }
                     } )
                     .catch( () => {
-                            this.errorMessage = EXCHANGE_NOT_AVAILABLE_ERR;
+                            this.errorMessage = ErrorMsg.EXCHANGE_NOT_AVAILABLE_ERR;
                     } );
             } else {
-                this.errorMessage = EXCHANGE_NOT_AVAILABLE_ERR;
+                this.errorMessage = ErrorMsg.EXCHANGE_NOT_AVAILABLE_ERR;
             }
         },
-
+        
+        //For converting crypto currency to fiat currency, it first convert the
+        //given crypto currency to EUR and then convert the EURO to the given
+        //fiat currency. Then it either updates the converted currency value
+        //or display a message in case of error
         cryptoToFiatCurrencyExchangeRate: function( fromCurrency, toCurrency,
                                             fromCurrencyVal ) {
             var intermediateCurrency = "EUR";
@@ -290,13 +314,19 @@ export default {
                     }
                     } )
                 .catch( () => {
-                    this.errorMessage = EXCHANGE_NOT_AVAILABLE_ERR;
+                    this.errorMessage = ErrorMsg.EXCHANGE_NOT_AVAILABLE_ERR;
                 } );
             } else {
-                this.errorMessage = EXCHANGE_NOT_AVAILABLE_ERR;
+                this.errorMessage = ErrorMsg.EXCHANGE_NOT_AVAILABLE_ERR;
             }
         },
 
+        //checks whether the exchange rate between two crypto currencies is 
+        //available. First, check the exchange rate for  FromCurrency - ToCurrency
+        //and if its available then, returns [ 0,  << fromCurrency + toCurrency >> ].
+        //Else if its avilable for ToCurrency - FromCurrency then returns 
+        //[ 1,  << toCurrency + fromCurrency >> ], else returns
+        //[ -1, << fromCurrency + toCurrency >> ]
         isCryptoToCryptoCurrencyExchangePossible: function( fromCurrency,
                                                     toCurrency ) {
             var symbol = fromCurrency + toCurrency;
@@ -317,36 +347,38 @@ export default {
 
 <style scoped lang="scss">
 
-    .content {
-        display: flex;
-        align-self: center;
-        justify-content: space-around;
-        margin: 2rem;
-        padding: 1rem;
-        box-shadow: 0 0 10px rgba(0,0,0,.1);
+@import "./../assets/scss/_variables.scss";
 
-        .currency-convert {
-            flex-basis: 6%;
-            align-self:center;
-            .convert-button {
-                width: 100%;
-                box-shadow: 0 0 5px -1px rgba(0,0,0,0.2);
-                cursor:pointer;
-                padding: 0.3rem;
-            }
-            .convert-button:active {
-                box-shadow: 0 0 5px -1px rgba(0,0,0,0.6);
-            }
+.content {
+    display: flex;
+    align-self: center;
+    justify-content: space-around;
+    margin: 2rem;
+    padding: 1rem;
+    box-shadow: 0 0 0.7rem rgba(0,0,0,.1);
+
+    .currency-convert {
+        flex-basis: 6%;
+        align-self:center;
+        .convert-button {
+            width: 100%;
+            box-shadow: 0 0 0.35rem -0.06rem rgba(0,0,0,0.2);
+            cursor:pointer;
+            padding: 0.3rem;
         }
-
+        .convert-button:active {
+            box-shadow: 0 0 0.35rem -0.06rem rgba(0,0,0,0.6);
+        }
     }
 
-    .error-bar {
-        color: #D8000C;
-        background-color: #FFBABA;
-        border: 1px solid;
-        background-repeat: no-repeat;
-        background-position: 10px center;
-    }
+}
+
+.error-bar {
+    color: $error-msg-color;
+    background-color:$error-msg-background;
+    border: 0.06rem solid;
+    background-repeat: no-repeat;
+    background-position: 0.7rem center;
+}
 
 </style>

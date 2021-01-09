@@ -16,20 +16,20 @@
       </div>
     </div>
 
-    <currency-exchange-component></currency-exchange-component>
+    <the-currency-exchange-component></the-currency-exchange-component>
   </div>
 </template>
 
 <script>
 
 import apiService from './apiService.js'
-import CurrencyExchangeComponent from "@/components/CurrencyExchangeComponent.vue";
+import TheCurrencyExchangeComponent from "@/components/TheCurrencyExchangeComponent.vue";
 
 export default {
   name: 'App',
   mixins: [apiService],
   components: {
-    CurrencyExchangeComponent
+    TheCurrencyExchangeComponent
   },
   data() {
     return {
@@ -41,14 +41,17 @@ export default {
 
 <style lang="scss">
 
+@import "./assets/scss/_variables.scss";
+
 .container {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  color: #2e4369;
+  color: $base-color;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  overflow: hidden;
 
   .top-bar {
     display: flex;
@@ -57,22 +60,22 @@ export default {
     width: 100%;
     transition: all 0.5s;
     align-items: center;
-    background-color: #fff;
+    background-color: $background-color;
     padding: 1rem;
-    box-shadow: 0 0 10px rgba(0,0,0,.1);
+    box-shadow: 0 0 0.7rem rgba(0,0,0,.1);
 
     .logo-container {
       align-self: center;
       padding-right: 1rem;
       max-height: 95%;
       .logo {
-        height: 60px;
+        height: 4rem;
       }
     }
 
     .title {
       align-self: center;
-      color: #00B685;
+      color: $primary-color;
     }
   }
   

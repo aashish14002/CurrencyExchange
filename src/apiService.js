@@ -1,33 +1,32 @@
 import axios from "axios"
-// import constants from "constants"
+import { UrlConst } from './config.js';
 
 export default{
     name: "apiService",
     data(){
         return{
-            FIAT_CURRENCY_URL : "https://api.exchangeratesapi.io/latest/",
-            CRYPTO_CURRENCY_URL : "https://api.binance.com/api/v3/"
+            
         }
     },
     methods: {
         $_getFiatCurrencyListURL: function() {
-            return this.FIAT_CURRENCY_URL;
+            return UrlConst.FiatCurrencyUrl;
         },
 
         $_getFiatCurrencyExchangeRateURL: function(from, to) {
             if(from == "EUR"){
-                return this.FIAT_CURRENCY_URL + "?symbols=" + to;
+                return UrlConst.FiatCurrencyUrl + "?symbols=" + to;
             } else {
-                return this.FIAT_CURRENCY_URL + "?base="+ from + "&" + "symbols=" + from + "," + to;   
+                return UrlConst.FiatCurrencyUrl + "?base="+ from + "&" + "symbols=" + from + "," + to;   
             }
         },
 
         $_getCryptoCurrencyListURL: function() {
-            return this.CRYPTO_CURRENCY_URL + "exchangeInfo";
+            return UrlConst.CryptoCurrencyUrl + "exchangeInfo";
         },
 
         $_getCryptoCurrencyExchangeRateURL: function(symbol) {
-            return this.CRYPTO_CURRENCY_URL + "ticker/price?symbol=" + symbol;
+            return UrlConst.CryptoCurrencyUrl + "ticker/price?symbol=" + symbol;
         },
         
         $_getCurrencyData: function(url){

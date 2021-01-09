@@ -138,64 +138,65 @@ export default {
 
 <style scoped lang="scss">
 
-    .currency-section {
-        display: flex;
-        flex-direction: column;
-        padding: 2%;
-        flex-basis: 40%;
+@import "./../assets/scss/_variables.scss";
 
-        .currency-heading {
-            padding: 0.5rem;
-            color: #808080;
-        }
-        .currency-type {
-            padding: 0.5rem;
+.currency-section {
+    display: flex;
+    flex-direction: column;
+    padding: 2%;
+    flex-basis: 40%;
 
-            .cursor-pointer {
-                cursor: pointer;
-            }
+    .currency-heading {
+        padding: 0.5rem;
+    }
+    .currency-type {
+        padding: 0.5rem;
 
-            .currency-type-block {
-                display: inline-block;
-                margin-right: .5rem;
-            }
+        .cursor-pointer {
+            cursor: pointer;
         }
 
-        .currency-option {
-            padding: 0.5rem;
-
-            .currency-select {
-                height: 20px;
-                width: 6.7rem;
-                margin-right: 1rem;
-                margin-bottom: 1rem;
-            }
-
-            .output {
-                text-rendering: auto;
-                letter-spacing: normal;
-                word-spacing: normal;
-                text-transform: none;
-                text-indent: 0px;
-                text-shadow: none;
-                display: inline-block;
-                text-align: start;
-                appearance: textfield;
-                margin: 0em;
-                padding: 1px 2px;
-                border-width: 1px;
-                border-style: solid;
-                border-color:#808080;
-            }
-
-            .currency-value {
-                width:  100px;
-                font: 14px;
-            }
-        }
-
-        .spacing-left {
-            padding-left: min(40% , calc(100% - 300px));
+        .currency-type-block {
+            display: inline-block;
+            margin-right: .5rem;
         }
     }
+
+    .currency-option {
+        padding: 0.5rem;
+
+        .currency-select {
+            height: 1.25rem;
+            width: 6.7rem;
+            margin-right: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .output {
+            text-rendering: auto;
+            letter-spacing: normal;
+            word-spacing: normal;
+            text-transform: none;
+            text-indent: 0rem;
+            text-shadow: none;
+            display: inline-block;
+            text-align: start;
+            appearance: textfield;
+            margin: 0em;
+            padding: 0.06rem 0.12rem;
+            border-width: 0.06rem;
+            border-style: solid;
+            border-color: $base-color;
+        }
+
+        .currency-value {
+            width:  6.25rem;
+            font: 0.875rem;
+        }
+    }
+
+    .spacing-left {
+        padding-left: min(40% , calc(100% - 18.75rem));
+    }
+}
 </style>
