@@ -182,12 +182,14 @@ export default {
         fromCurrencyType: function( updatedVal ) {
             if ( updatedVal != undefined ) {
                 this.fromCurrencyName = "";
+                this.toCurrencyValue = 0;
             }
         },
 
         toCurrencyType: function( updatedVal ) {
             if ( updatedVal != undefined ) {
                 this.toCurrencyName = "";
+                this.toCurrencyValue = 0;
             }
         }
     },
