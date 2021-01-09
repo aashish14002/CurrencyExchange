@@ -170,6 +170,7 @@ export default {
             width: 6.7rem;
             margin-right: 1rem;
             margin-bottom: 1rem;
+            vertical-align: top;
         }
 
         .output {
@@ -187,11 +188,13 @@ export default {
             border-width: 0.06rem;
             border-style: solid;
             border-color: $base-color;
+            overflow-x: hidden;
+            text-overflow: ellipsis;
         }
 
         .currency-value {
             width:  6.25rem;
-            font: 0.875rem;
+            font-size: 0.875rem;
         }
     }
 

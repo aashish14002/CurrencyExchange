@@ -1,6 +1,7 @@
 import {registerRoute} from 'workbox-routing';
 import {CacheFirst} from 'workbox-strategies';
 import {CacheableResponsePlugin} from 'workbox-cacheable-response';
+import {ExpirationPlugin} from 'workbox-expiration';
 
 registerRoute(
   ( { url } ) => url.origin === 'https://api.exchangeratesapi.io/latest/' ||
@@ -19,7 +20,7 @@ registerRoute(
       } ),
       new ExpirationPlugin( {
         maxAgeSeconds: 24 * 60 * 60,
-      } ),
+      } )
     ]
   } )
 );
