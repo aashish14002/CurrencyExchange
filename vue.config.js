@@ -10,5 +10,8 @@ module.exports = {
       // swSrc is required in InjectManifest mode.
       swSrc: 'serviceWorker.js',
     }
-  }
+  },
+  publicPath: process.env.NODE_ENV === 'production'
+    ? '/CurrencyExchange/'
+    : '/'
 }
