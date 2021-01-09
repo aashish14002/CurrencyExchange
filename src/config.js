@@ -7,7 +7,7 @@ export const ErrorMsg = Object.freeze( {
 
 export const LabelMsg = Object.freeze( {
     FromCurrencyLabel: "Currency I Have",
-    ToCurrencyLabel: "Cuurency I Want",
+    ToCurrencyLabel: "Currency I Want",
     FromCurrencyTypeLabel: "Fiat Currency",
     ToCurrencyTypeLabel: "Crypto Currency",
     FromCurrencyType: "fiat",
