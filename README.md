@@ -9,6 +9,7 @@ api: https://exchangeratesapi.io/.
 api: https://api.binance.com/api/v3/ticker/price (documentation here: https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#symbol-price-ticker)
 
 # Directory Structure
+```
 ── ...
 ├── src                   
 │   ├── assets                                  # Stores icons, logos, scss files
@@ -25,6 +26,7 @@ api: https://api.binance.com/api/v3/ticker/price (documentation here: https://gi
 │   └── registerServiceWorker.js                
 ├──serviceWorker.js                             # Execute cache strategy 
 └── ...
+```
 
 ## Project setup
 ```
