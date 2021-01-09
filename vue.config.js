@@ -3,15 +3,12 @@ module.exports = {
       name: 'Currency Exchange',
       themeColor: '#00B685',
       msTileColor: '#000000',
-      appleMobileWebAppCapable: 'yes',
-      appleMobileWebAppStatusBarStyle: 'black',
   
       // configure the workbox plugin
       workboxPluginMode: 'InjectManifest',
       workboxOptions: {
         // swSrc is required in InjectManifest mode.
-        swSrc: 'service-worker.js',
-        // ...other Workbox options...
+        swSrc: 'serviceWorker.js',
       }
     }
 }

@@ -1,13 +1,21 @@
 <template>
-  <div id="app" class="container">
+  <div
+    id="app"
+    class="container"
+  >
     <div class="top-bar">
       <div class="logo-container">
-        <img alt="Exchange Currency logo" class="logo" src="./assets/logo.png"/>
+        <img
+          alt="Exchange Currency logo"
+          class="logo"
+          src="./assets/logo.png"
+        />
       </div>
       <div class="title">
         <h1>Currency Exchange</h1>
       </div>
     </div>
+    
     <currency-exchange-component></currency-exchange-component>
   </div>
 </template>

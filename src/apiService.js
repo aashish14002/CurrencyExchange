@@ -9,27 +9,28 @@ export default{
             CRYPTO_CURRENCY_URL : "https://api.binance.com/api/v3/"
         }
     },
-    created() {
-        
-    },
     methods: {
-        getFiatCurrencyListURL: function() {
+        $_getFiatCurrencyListURL: function() {
             return this.FIAT_CURRENCY_URL;
         },
-        getFiatCurrencyExchangeRateURL: function(from, to) {
+
+        $_getFiatCurrencyExchangeRateURL: function(from, to) {
             if(from == "EUR"){
                 return this.FIAT_CURRENCY_URL + "?symbols=" + to;
             } else {
                 return this.FIAT_CURRENCY_URL + "?base="+ from + "&" + "symbols=" + from + "," + to;   
             }
         },
-        getCryptoCurrencyListURL: function() {
+
+        $_getCryptoCurrencyListURL: function() {
             return this.CRYPTO_CURRENCY_URL + "exchangeInfo";
         },
-        getCryptoCurrencyExchangeRateURL: function(symbol) {
+
+        $_getCryptoCurrencyExchangeRateURL: function(symbol) {
             return this.CRYPTO_CURRENCY_URL + "ticker/price?symbol=" + symbol;
         },
-        getCurrencyData: function(url){
+        
+        $_getCurrencyData: function(url){
             return axios.get(url).then( result =>{
                 return result.data
             }, error => {
