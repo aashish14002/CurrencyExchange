@@ -15,7 +15,7 @@
         <h1>Currency Exchange</h1>
       </div>
     </div>
-    
+
     <currency-exchange-component></currency-exchange-component>
   </div>
 </template>
@@ -54,6 +54,7 @@ export default {
     display: flex;
     flex-direction: row;
     height: 4rem;
+    width: 100%;
     transition: all 0.5s;
     align-items: center;
     background-color: #fff;

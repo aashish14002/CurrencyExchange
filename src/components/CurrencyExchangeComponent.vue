@@ -1,57 +1,17 @@
 <template>
     <div>
         <div class="content"> 
-            <div class="currency-section">
-                <h2 class="currency-heading">Currency I have</h2>
-                <div class="currency-type ">
-                    <input 
-                        class="currency-type-input cursor-pointer"
-                        type="radio"
-                        id="fiatFrom"
-                        value="fiat"
-                        checked="checked"
-                        v-model="fromCurrencyType"
-                    >
-                    <label 
-                        for="fiatFrom"
-                        class="cursor-pointer"
-                    >
-                        Fiat Currency
-                    </label>
-                    <input
-                        class="currency-type-input cursor-pointer"
-                        type="radio"
-                        id="cryptoFrom"
-                        value="crypto"
-                        v-model="fromCurrencyType"
-                    >
-                    <label
-                        class="cursor-pointer"
-                        for="cryptoFrom"
-                    >
-                        Crypto Currency
-                    </label>
-                </div>
-                <div class="currency-option">
-                    <select 
-                        class="currency-select"
-                        id="fromCurrencyNameId"
-                        v-model="fromCurrencyName">
-                            <option disabled value="">-Select-</option>
-                            <option 
-                                v-for="option in fromCurrencyOptions" 
-                                :key="option" 
-                                :value="option"
-                            >
-                                {{ option }}
-                            </option>
-                    </select>
-                    <input 
-                        id="from-currency-value"
-                        type="number"
-                        v-model="fromCurrencyValue">
-                </div>
-            </div>
+            
+            <base-currency-input
+                :heading="fromCurrencyLabel"
+                :currency-type-label0="fiatCurrencyTypeLabel"
+                :currency-type-label1="cryptoCurrencyTypeLabel"
+                :currency-options="currencyOptions"
+                :isDisabledCurrencyValue="false"
+                @on-currency-input-change="onFromCurrencyInputChange"
+                @on-currency-name-change="onFromCurrencyNameChange"
+                @on-currency-value-change="onFromCurrencyValueChange" 
+            />
 
             <div class="currency-convert">
                 <div
@@ -66,62 +26,17 @@
                 </div>
             </div>
 
-            <div class="currency-section">
-                <h2 class="currency-heading spacing-left">Currency I Want</h2>
-                <div class="currency-type spacing-left">
-                    <input
-                        class="currency-type-input cursor-pointer"
-                        type="radio"
-                        id="fiatTo"
-                        value="fiat"
-                        checked="checked"
-                        v-model="toCurrencyType"
-                    >
-                    <label
-                        class="cursor-pointer"
-                        for="fiatTo"
-                    >
-                        Fiat Currency
-                    </label>
-                    <input
-                        class="currency-type-input cursor-pointer"
-                        type="radio"
-                        id="cryptoTo"
-                        value="crypto"
-                        v-model="toCurrencyType"
-                    >
-                    <label
-                        class="cursor-pointer"
-                        for="cryptoTo"
-                    >
-                        Crypto Currency
-                    </label>
-                </div>
-                
-                <div class="currency-option spacing-left">
-                    <select
-                        class="currency-select"
-                        id="toCurrencyNameId"
-                        v-model="toCurrencyName"
-                    >
-                        <option disabled value="">-Select-</option>
-                        <option
-                            v-for="option in toCurrencyOptions"
-                            :key="option"
-                            :value="option"
-                        >
-                            {{ option }}
-                        </option>
-                    </select>
-                    <input
-                        id="to-currency-value"
-                        type="number"
-                        v-model="toCurrencyValue"
-                        :disabled=true
-                    >
-                </div>
-            
-            </div>
+            <base-currency-input
+                :heading="toCurrencyLabel"
+                :currency-type-label0="fiatCurrencyTypeLabel"
+                :currency-type-label1="cryptoCurrencyTypeLabel"
+                :currency-options="currencyOptions"
+                :isDisabledCurrencyValue="true"
+                @on-currency-input-change="onToCurrencyInputChange"
+                @on-currency-name-change="onToCurrencyNameChange"
+                :val="toCurrencyValue"
+            />
+
         </div>
 
         <div 
@@ -138,6 +53,7 @@
 <script>
 
 import apiService from './../apiService.js'
+import BaseCurrencyInput from "./BaseCurrencyInput.vue";
 
 const EXCHANGE_NOT_AVAILABLE_ERR = "Exchange Rate not available for this currency";
 const SELECT_CURRENCY_MSG = "Please Select Currencies!";
@@ -146,9 +62,14 @@ export default {
     name: 'CurrencyExchangeComponent',
     mixins: [apiService],
     components: {
+        BaseCurrencyInput
     },
     data() {
         return {
+            fromCurrencyLabel: "Currency I Have",
+            toCurrencyLabel: "Cuurency I Want",
+            fiatCurrencyTypeLabel: "Fiat Currency",
+            cryptoCurrencyTypeLabel: "Crypto Currency",
             cryptoCurrencyOptions: [],
             fiatCurrencyOptions: [],
             fromCurrencyName: "",
@@ -162,35 +83,11 @@ export default {
         }
     },
     computed: {
-        fromCurrencyOptions: function() {
-            if ( this.fromCurrencyType == "fiat" ) {
-                return this.fiatCurrencyOptions;
-            } else {
-                return this.cryptoCurrencyOptions;
-            }
-        },
-
-        toCurrencyOptions: function() {
-            if( this.toCurrencyType == "fiat" ) {
-                return this.fiatCurrencyOptions;
-            } else {
-                return this.cryptoCurrencyOptions;
-            }
-        }
-    },
-    watch: {
-        fromCurrencyType: function( updatedVal ) {
-            if ( updatedVal != undefined ) {
-                this.fromCurrencyName = "";
-                this.toCurrencyValue = 0;
-            }
-        },
-
-        toCurrencyType: function( updatedVal ) {
-            if ( updatedVal != undefined ) {
-                this.toCurrencyName = "";
-                this.toCurrencyValue = 0;
-            }
+        currencyOptions: function() {
+            return {
+                0: this.fiatCurrencyOptions,
+                1: this.cryptoCurrencyOptions
+            };
         }
     },
     created() {
@@ -224,9 +121,57 @@ export default {
         
     },
     methods: {
+
+        onFromCurrencyInputChange: function( currencyType ) {
+            this.fromCurrencyType = this.getCurrencyType(currencyType);
+            this.fromCurrencyName = "";
+            this.toCurrencyValue = 0;
+            this.errorMessage = "";
+        },
+
+        onToCurrencyInputChange: function( currencyType ) {
+            this.toCurrencyType = this.getCurrencyType(currencyType);
+            this.toCurrencyName = "";
+            this.toCurrencyValue = 0;
+            this.errorMessage = "";
+        },
+
+        onFromCurrencyNameChange: function( currencyName ) {
+            this.fromCurrencyName = currencyName;
+            this.toCurrencyValue = 0;
+            this.errorMessage = "";
+        },
+
+        onToCurrencyNameChange: function( currencyName ) {
+            this.toCurrencyName = currencyName;
+            this.toCurrencyValue = 0;
+            this.errorMessage = "";
+        },
+
+        onFromCurrencyValueChange: function( currencyVal ) {
+            this.fromCurrencyValue = currencyVal;
+            this.toCurrencyValue = 0;
+            this.errorMessage = "";
+        },
+
+        getCurrencyType: function( currencyType ) {
+            if ( currencyType == 0 ) {
+                return "fiat"
+            } else {
+                return "crypto"
+            }
+        },
+
         convertCurrency: function() {
             if ( this.fromCurrencyName != "" && this.toCurrencyName != "" ) {
+
                 this.errorMessage = "";
+
+                if( this.fromCurrencyName == this.toCurrencyName ) {
+                    this.toCurrencyValue = this.fromCurrencyValue;
+                    return;
+                }
+
                 if ( this.fromCurrencyType == "fiat" ) {
                     if ( this.toCurrencyType == "fiat" ) {
                         this.fiatToFiatCurrencyExchange(
@@ -371,48 +316,14 @@ export default {
 </script>
 
 <style scoped lang="scss">
+
     .content {
         display: flex;
         align-self: center;
         justify-content: space-around;
-        width: 90%;
         margin: 2rem;
         padding: 1rem;
         box-shadow: 0 0 10px rgba(0,0,0,.1);
-    
-        .currency-section {
-            display: flex;
-            flex-direction: column;
-            padding: 2%;
-            flex-basis: 40%;
-            .currency-type {
-                padding: 0.5rem;
-
-                .cursor-pointer {
-                    cursor: pointer;
-                }
-            }
-
-            .currency-option {
-                padding: 0.5rem;
-            }
-
-            .currency-heading {
-                padding: 0.5rem;
-                color: #808080;
-            }
-
-            .spacing-left {
-                padding-left: min(40% , calc(100% - 300px));
-            }
-        }
-
-        .currency-select {
-            height: 20px;
-            width: 6.7rem;
-            margin-right: 1rem;
-            margin-bottom: 1rem;
-        }
 
         .currency-convert {
             flex-basis: 6%;
