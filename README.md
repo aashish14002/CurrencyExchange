@@ -1,6 +1,7 @@
 # Currency Exchange
 
 Application to convert fiat and crypto currencies. Just enter select the currencies, enter an amount and get it converted to the selected currency.
+Link to the application - https://aashish14002.github.io/CurrencyExchange/
 
 ## For fiat currencies
 api: https://exchangeratesapi.io/.
